@@ -1,9 +1,14 @@
 //	deadline.js	- Half assed deadline tracker
-const jsonObj = require('./deadlines.json');
+const fs = require('fs');
+const jsonObj = require("./deadlines.json");
+
 function refresh_deadlines() {
 	//	TODO:	Needs to update deadlines.json file
 	//			Rather than just reassociating jsonObj.deadlines
 	jsonObj.deadlines = deadlines;
+	fs.writeFile("./deadlines.json", JSON.stringify(jsonObj), function(err) {
+		if(err) console.log('ERROR: Could not write to File');
+	});
 }
 let i = 0;
 const deadlines = jsonObj.deadlines;
@@ -23,14 +28,20 @@ module.exports = {
 			let b = 4;
 			for (i in deadlines) {
 				(deadlines[i].id > a) ? a = deadlines[i].id : null;
+				//	Duplicate Checking
+				if (deadlines[i].subject === args[1] && deadlines[i].due_date === args[2]) {
+					message.channel.send('**Deadline already exists!**');
+					console.log('ERROR: deadline already exists\n' + args + '\nWith ID: ' + deadlines[i].id);
+					return;
+				}
 			}
 			//	One higher
 			a++;
-			while (b <= i) {
-				output = args[b] + ' ';
+			while (b < args.length) {
+				output = output + args[b] + ' ';
 				b++;
 			}
-			deadlines[i + 1] = { "id" : a, "subject" : args[1], "topic" : args[4], "due_date" : args[2], "due_time" : args[3] };
+			deadlines[i + 1] = { "id" : a, "subject" : args[1], "topic" : output, "due_date" : args[2], "due_time" : args[3] };
 			message.channel.send('Assignment **ID**\t' + a + '\tHas been added successfully!');
 			refresh_deadlines();
 		}
@@ -45,7 +56,6 @@ module.exports = {
 				for (i in deadlines) {
 					if (deadlines[i].id === idtag) {
 						deadlines.splice(i, 1);
-						refresh_deadlines();
 						in_list = 1;
 						break;
 					}
@@ -61,6 +71,7 @@ module.exports = {
 				message.channel.send(args[1] + ' is not a valid number!');
 				console.log('ERROR: Deadline - NAN Val: ' + args[1]);
 			}
+			refresh_deadlines();
 		}
 		else if (args[0] == '--update') {
 			//	formatting
@@ -74,6 +85,7 @@ module.exports = {
 				}
 			}
 			message.channel.send('**ID**\t' + args[1] + '\tHas been successfully updated!');
+			refresh_deadlines();
 		}
 		else if (args[0] == '--check') {
 			message.channel.send('**Here are all upcoming deadlines**');
