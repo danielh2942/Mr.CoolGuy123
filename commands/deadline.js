@@ -2,6 +2,15 @@
 const fs = require('fs');
 const jsonObj = require("./deadlines.json");
 
+function deadlines_fetch() {
+	let output = '';
+	for (i in deadlines) {
+		console.log('checking deadlines');
+		output = '**ID:**\t' + deadlines[i].id + '\t**Subject:**\t' + deadlines[i].subject + '\t-\t' + deadlines[i].topic + '\t**Due Date:**\t' + deadlines[i].due_date + '\t' + deadlines[i].due_time + '\n';
+	}
+	return output;
+}
+
 function refresh_deadlines() {
 	//	TODO:	Needs to update deadlines.json file
 	//			Rather than just reassociating jsonObj.deadlines
@@ -89,11 +98,8 @@ module.exports = {
 		}
 		else if (args[0] == '--check') {
 			message.channel.send('**Here are all upcoming deadlines**');
-			for (i in deadlines) {
-				console.log('checking deadlines');
-				output = '**ID:**\t' + deadlines[i].id + '\t**Subject:**\t' + deadlines[i].subject + '\t-\t' + deadlines[i].topic + '\t**Due Date:**\t' + deadlines[i].due_date + '\t' + deadlines[i].due_time;
-				message.channel.send(output);
-			}
+			output = deadlines_fetch(deadlines);
+			message.channel.send(output);
 		}
 		else if (args[0] == '--help') {
 			//	TODO: This.
