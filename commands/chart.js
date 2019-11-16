@@ -26,7 +26,7 @@ module.exports = {
 			has_options = 0;
 		}
 		message.channel.send('Chart for ' + args[(0 + has_options)], {
-			file:('http://tapmusic.net/collage.php?user=' + args[(0 + has_options)] + '&type=' + option + '&size=5x5&caption=true'),
+			file:('http://tapmusic.net/collage.php?user=' + args[(0 + has_options)] + '&type=' + option + '&size=5x5&caption=true.png'),
 		});
 	},
 };
