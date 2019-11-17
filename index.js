@@ -26,7 +26,7 @@ client.on('message', message => {
 		//	This is the epic script
 		if(message.author.username == prev_author) {
 			prev_count++;
-			if (prev_count == 3) {
+			if (prev_count == 8) {
 				const id = "<@" + message.author.id + ">";
 				message.channel.send("Shut the fuck up " + id);
 			}
