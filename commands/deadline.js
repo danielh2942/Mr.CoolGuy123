@@ -23,8 +23,8 @@ let check = Schedule.scheduleJob(rule, function() {
 	
 	// function to warn people, based on date now and date of asssignment
 	// please to look over
-	// for conveinence, it is possible to formate date in javascript as a complete formate
-	// ie the json object lists time as one string?
+	// for conveinence ( in order for this code to work), it is possible to format date for json as the standard format
+	// i.e. deadlines.json due_date is listed as e.g. Sun Nov 17 2019
 	const date = new Date();
 	let timeNow = date.toLocaleTimeString();
 	let dateNow = date.toDateString();
