@@ -1,6 +1,6 @@
 { 
 	"name" : "cooltest",
-	"subjects" : ["MA190","EE130","CT101","CT102","CT103","CT1112","CT1113","PH150","BCT1"],
+	"subjects" : ["MA190","EE130","CT101","CT102","CT103","CT1112","CT1113","PH150","BCT1",MA160],
 	"deadlines" : [
 		{
 			"id" 		:	1,
