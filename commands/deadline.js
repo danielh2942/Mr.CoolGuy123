@@ -11,6 +11,29 @@ function deadlines_fetch() {
 	return output;
 }
 
+// function to warn people, based on date now and date of asssignment
+// please to look over
+// for conveinence, it is possible to formate date in javascript as a complete formate
+// ie the json object lists time as one string?
+/* function date_deadline_alarm_check() {
+const date = new Date();
+let timeNow = date.toLocaleTimeString();
+let dateNow = date.toDateString();
+let timeDeadline = jsonObj.deadlines[i].due_time;
+
+
+for (i in deadlines) {
+    if (jsonObj.deadlines[i].due_date == dateNow) {
+        message.channel.send('WARNING: Assignment'+jsonObj.deadlines[i].id+"is due today!!!');
+        // there isn't really a better way to describe the deadlines
+        // apart from id
+        // add a name field?
+    }
+}
+
+
+}*/
+
 function refresh_deadlines() {
 	//	TODO:	Needs to update deadlines.json file
 	//			Rather than just reassociating jsonObj.deadlines
