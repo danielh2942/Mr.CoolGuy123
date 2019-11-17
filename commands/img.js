@@ -15,6 +15,7 @@ module.exports = {
 			for (arg in args) {
 				query = query + args[arg] + '+';
 			}
+			query = query.slice(0, -1);
 		}
 		else {
 			query = args[0];
