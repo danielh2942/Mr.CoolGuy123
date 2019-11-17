@@ -1,6 +1,9 @@
 //	deadline.js	- Half assed deadline tracker
 const fs = require('fs');
 const jsonObj = require("./deadlines.json");
+const Schedule = require("node-schedule");
+
+const deadlines = jsonObj.deadlines;
 
 function deadlines_fetch() {
 	let output = '';
@@ -10,30 +13,37 @@ function deadlines_fetch() {
 	}
 	return output;
 }
+/*
+// Daily Check for recurrence at 8:30 am lol
+let rule = Schedule.RecurrenceRule();
+rule.hour = 8;
+rule.minute = 30;
 
-// function to warn people, based on date now and date of asssignment
-// please to look over
-// for conveinence, it is possible to formate date in javascript as a complete formate
-// ie the json object lists time as one string?
-/* function date_deadline_alarm_check() {
-const date = new Date();
-let timeNow = date.toLocaleTimeString();
-let dateNow = date.toDateString();
-let timeDeadline = jsonObj.deadlines[i].due_time;
-
-
-for (i in deadlines) {
-    if (jsonObj.deadlines[i].due_date == dateNow) {
-        message.channel.send('WARNING: Assignment'+jsonObj.deadlines[i].id+"is due today!!!');
-        // there isn't really a better way to describe the deadlines
-        // apart from id
-        // add a name field?
-    }
-}
+let check = Schedule.scheduleJob(rule, function() { 
+	
+	// function to warn people, based on date now and date of asssignment
+	// please to look over
+	// for conveinence, it is possible to formate date in javascript as a complete formate
+	// ie the json object lists time as one string?
+	const date = new Date();
+	let timeNow = date.toLocaleTimeString();
+	let dateNow = date.toDateString();
+	let timeDeadline = jsonObj.deadlines[i].due_time;
 
 
-}*/
+	for (i in deadlines) {
+	    if (jsonObj.deadlines[i].due_date == dateNow) {
+	        message.channel.send('WARNING: Assignment ' + jsonObj.deadlines[i].topic + ' is due today!!!');
+	        // there isn't really a better way to describe the deadlines
+	        // apart from id
+	        // add a name field?
+		// 
+		// The topic field is the name/nature of the assignment
+	    }
+	}
 
+});
+*/	
 function refresh_deadlines() {
 	//	TODO:	Needs to update deadlines.json file
 	//			Rather than just reassociating jsonObj.deadlines
@@ -43,7 +53,6 @@ function refresh_deadlines() {
 	});
 }
 let i = 0;
-const deadlines = jsonObj.deadlines;
 module.exports = {
 	name: 'deadline',
 	description: 'Reminds you of upcoming assignment deadlines!',
@@ -58,6 +67,10 @@ module.exports = {
 			let a = 0;
 			//	b holds the start of the trailing arguements lol
 			let b = 4;
+			if deadlines.subject.includes(args[1]) {
+				//	Sets generic if subject is not real
+				args[1] = "1BCT1";
+			}
 			for (i in deadlines) {
 				(deadlines[i].id > a) ? a = deadlines[i].id : null;
 				//	Duplicate Checking
