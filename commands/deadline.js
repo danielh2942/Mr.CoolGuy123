@@ -1,7 +1,7 @@
 //	deadline.js	- Half assed deadline tracker
 const fs = require('fs');
 const jsonObj = require("./deadlines.json");
-const Schedule = require("node-schedule");
+const Schedule = require('cron').CronJob;
 
 const deadlines = jsonObj.deadlines;
 
@@ -9,17 +9,26 @@ function deadlines_fetch() {
 	let output = '';
 	for (i in deadlines) {
 		console.log('checking deadlines');
-		output = '**ID:**\t' + deadlines[i].id + '\t**Subject:**\t' + deadlines[i].subject + '\t-\t' + deadlines[i].topic + '\t**Due Date:**\t' + deadlines[i].due_date + '\t' + deadlines[i].due_time + '\n';
+		//	Forgot to append results rip
+		output = output + '**ID:**\t' + deadlines[i].id + '\t**Subject:**\t' + deadlines[i].subject + '\t-\t' + deadlines[i].topic + '\t**Due Date:**\t' + deadlines[i].due_date + '\t' + deadlines[i].due_time + '\n';
 	}
 	return output;
 }
-/*
-// Daily Check for recurrence at 8:30 am lol
-let rule = Schedule.RecurrenceRule();
-rule.hour = 8;
-rule.minute = 30;
 
-let check = Schedule.scheduleJob(rule, function() { 
+//	Made in prep for the deadline task thing lol
+function deadline_remove(idtag) {
+	for (i in deadlines) {
+		if (deadlines[i].id === idtag) {
+			deadlines.splice(i, 1);
+			refresh_deadlines();
+			return 1;
+		}
+	}
+	return 0;
+}
+/*
+//	Checks Daily at 8:30 AM Because I figured that'd make sense
+new Schedule('0 30 8 * * *', function() { 
 	
 	// function to warn people, based on date now and date of asssignment
 	// please to look over
@@ -37,8 +46,11 @@ let check = Schedule.scheduleJob(rule, function() {
 	        // there isn't really a better way to describe the deadlines
 	        // apart from id
 	        // add a name field?
-		// 
-		// The topic field is the name/nature of the assignment
+			// 
+			// The topic field is the name/nature of the assignment
+			//	It will set a reminder for the Job here I guess I'll work it out,
+			//	Changed to cron as cron is allegedly guaranteed to run
+			console.log('Alert Job set for ' + jsonObj.deadlines[i].ID + ' at ' + jsonObj.deadlines[i].due_time);
 	    }
 	}
 
@@ -52,7 +64,9 @@ function refresh_deadlines() {
 		if(err) console.log('ERROR: Could not write to File');
 	});
 }
+
 let i = 0;
+
 module.exports = {
 	name: 'deadline',
 	description: 'Reminds you of upcoming assignment deadlines!',
@@ -98,13 +112,8 @@ module.exports = {
 			let in_list = 0;
 			//	Obvious check to ensure that the ID you want rid of is an actual number lol
 			if (!isNaN(idtag)) {
-				for (i in deadlines) {
-					if (deadlines[i].id === idtag) {
-						deadlines.splice(i, 1);
-						in_list = 1;
-						break;
-					}
-				}
+				//	Made it into a function so the deadline alert can use it
+				in_list = deadline_remove(idtag);
 				if (in_list) {
 					message.channel.send('Assignment removed successfully!');
 				}
@@ -116,7 +125,6 @@ module.exports = {
 				message.channel.send(args[1] + ' is not a valid number!');
 				console.log('ERROR: Deadline - NAN Val: ' + args[1]);
 			}
-			refresh_deadlines();
 		}
 		else if (args[0] == '--update') {
 			//	formatting
