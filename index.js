@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Discord = require('discord.js');
+const Schedule = require('cron').CronJob;
 const { prefix, token, announce } = require('./config.json');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -68,6 +69,17 @@ client.on('message', message => {
 		console.error(error);
 		message.reply('there was an error trying to execute that command!');
 	}
+});
+
+// Monday 9am check lol
+new Schedule('0 0 9 * * 1', function() {
+	const command = client.commands.get('deadline');
+	command.checker(client, announce, 1);
+});
+//	Daily covert deadline check
+new Schedule('0 30 8 * * *', function() {
+	const command = client.commands.get('deadline');
+	command.checker(client, announce, 0);
 });
 
 client.login(token);
