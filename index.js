@@ -1,6 +1,5 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const Schedule = require('node-schedule');
 const { prefix, token, announce } = require('./config.json');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -69,10 +68,6 @@ client.on('message', message => {
 		console.error(error);
 		message.reply('there was an error trying to execute that command!');
 	}
-});
-
-const j = Schedule.scheduleJob({ hour: 23, minute: 20, dayOfWeek: 6 }, function() {
-	client.channels.get(announce).send("!deadline --check");
 });
 
 client.login(token);
