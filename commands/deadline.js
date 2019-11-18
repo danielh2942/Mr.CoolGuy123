@@ -1,7 +1,7 @@
 //	deadline.js	- Half assed deadline tracker
 const fs = require('fs');
 const jsonObj = require("./deadlines.json");
-const Schedule = require('cron').CronJob;
+// const Schedule = require('cron').CronJob;
 
 const deadlines = jsonObj.deadlines;
 
@@ -26,36 +26,7 @@ function deadline_remove(idtag) {
 	}
 	return 0;
 }
-/*
-//	Checks Daily at 8:30 AM Because I figured that'd make sense
-new Schedule('0 30 8 * * *', function() { 
-	
-	// function to warn people, based on date now and date of asssignment
-	// please to look over
-	// for conveinence ( in order for this code to work), it is possible to format date for json as the standard format
-	// i.e. deadlines.json due_date is listed as e.g. Sun Nov 17 2019
-	const date = new Date();
-	let timeNow = date.toLocaleTimeString();
-	let dateNow = date.toDateString();
-	let timeDeadline = jsonObj.deadlines[i].due_time;
 
-
-	for (i in deadlines) {
-	    if (jsonObj.deadlines[i].due_date == dateNow) {
-	        message.channel.send('WARNING: Assignment ' + jsonObj.deadlines[i].topic + ' is due today!!!');
-	        // there isn't really a better way to describe the deadlines
-	        // apart from id
-	        // add a name field?
-			// 
-			// The topic field is the name/nature of the assignment
-			//	It will set a reminder for the Job here I guess I'll work it out,
-			//	Changed to cron as cron is allegedly guaranteed to run
-			console.log('Alert Job set for ' + jsonObj.deadlines[i].ID + ' at ' + jsonObj.deadlines[i].due_time);
-	    }
-	}
-
-});
-*/	
 function refresh_deadlines() {
 	//	TODO:	Needs to update deadlines.json file
 	//			Rather than just reassociating jsonObj.deadlines
@@ -65,6 +36,29 @@ function refresh_deadlines() {
 	});
 }
 
+function deadline_warn(message) {
+	// function to warn people, based on date now and date of asssignment
+	// please to look over
+	// for conveinence ( in order for this code to work), it is possible to format date for json as the standard format
+	// i.e. deadlines.json due_date is listed as e.g. Sun Nov 17 2019
+	const date = new Date();
+	// let timeNow = date.toLocaleTimeString();
+	const dateNow = date.toDateString();
+	// let timeDeadline = jsonObj.deadlines[i].due_time;
+	for (i in deadlines) {
+		if (jsonObj.deadlines[i].due_date === dateNow) {
+			message.send('WARNING: Assignment ' + jsonObj.deadlines[i].topic + ' is due today!!!');
+			// there isn't really a better way to describe the deadlines
+			// apart from id
+			// add a name field?
+			//
+			// The topic field is the name/nature of the assignment
+			//	It will set a reminder for the Job here I guess I'll work it out,
+			//	Changed to cron as cron is allegedly guaranteed to run
+			console.log('Alert Job set for ' + jsonObj.deadlines[i].ID + ' at ' + jsonObj.deadlines[i].due_time);
+		}
+	}
+}
 let i = 0;
 
 module.exports = {
@@ -81,7 +75,7 @@ module.exports = {
 			let a = 0;
 			//	b holds the start of the trailing arguements lol
 			let b = 4;
-			if deadlines.subject.includes(args[1]) {
+			if (deadlines.subject.includes(args[1])) {
 				//	Sets generic if subject is not real
 				args[1] = "1BCT1";
 			}
@@ -153,6 +147,17 @@ module.exports = {
 			//	Mandatory Error Handling
 			message.channel.send('Invalid operator, please use --help to get all possible commands');
 			console.log('Deadline: error - Invalid operator ' + args[0]);
+		}
+	},
+	checker(client, channel, announce) {
+		const message = client.channels.get(channel);
+		if (announce) {
+			message.send("Happy Monday <@everyone> here are this weeks assignments!");
+			const output = deadlines_fetch();
+			message.send(output);
+		}
+		else {
+			deadline_warn(message);
 		}
 	},
 };
