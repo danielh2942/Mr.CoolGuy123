@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const Schedule = require('node-schedule');
+const Schedule = require('cron').CronJob;
 const { prefix, token, announce } = require('./config.json');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -71,8 +71,15 @@ client.on('message', message => {
 	}
 });
 
-const j = Schedule.scheduleJob({ hour: 23, minute: 20, dayOfWeek: 6 }, function() {
-	client.channels.get(announce).send("!deadline --check");
-});
+// Monday 9am check lol
+new Schedule('0 0 9 * * 1', function() {
+	const command = client.commands.get('deadline');
+	command.checker(client, announce, 1);
+}, null, true, 'Europe/Dublin');
+//	Daily covert deadline check
+new Schedule('0 30 8 * * *', function() {
+	const command = client.commands.get('deadline');
+	command.checker(client, announce, 0);
+}, null, true, 'Europe/Dublin');
 
 client.login(token);

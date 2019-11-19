@@ -1,15 +1,20 @@
 //	deadline.js	- Half assed deadline tracker
 const fs = require('fs');
 const jsonObj = require("./deadlines.json");
+// const Schedule = require('cron').CronJob;
+
+const deadlines = jsonObj.deadlines;
 
 function deadlines_fetch() {
 	let output = '';
 	for (i in deadlines) {
 		console.log('checking deadlines');
-		output = '**ID:**\t' + deadlines[i].id + '\t**Subject:**\t' + deadlines[i].subject + '\t-\t' + deadlines[i].topic + '\t**Due Date:**\t' + deadlines[i].due_date + '\t' + deadlines[i].due_time + '\n';
+		//	Forgot to append results rip
+		output = output + '**ID:**\t' + deadlines[i].id + '\t**Subject:**\t' + deadlines[i].subject + '\t-\t' + deadlines[i].topic + '\t**Due Date:**\t' + deadlines[i].due_date + '\t' + deadlines[i].due_time + '\n';
 	}
 	return output;
 }
+
 
 // function to warn people, based on date now and date of asssignment
 // please to look over
@@ -29,10 +34,17 @@ for (i in deadlines) {
         // apart from id
         // add a name field?
     }
+//	Made in prep for the deadline task thing lol
+function deadline_remove(idtag) {
+	for (i in deadlines) {
+		if (deadlines[i].id === idtag) {
+			deadlines.splice(i, 1);
+			refresh_deadlines();
+			return 1;
+		}
+	}
+	return 0;
 }
-
-
-}*/
 
 function refresh_deadlines() {
 	//	TODO:	Needs to update deadlines.json file
@@ -42,8 +54,32 @@ function refresh_deadlines() {
 		if(err) console.log('ERROR: Could not write to File');
 	});
 }
+
+function deadline_warn(message) {
+	// function to warn people, based on date now and date of asssignment
+	// please to look over
+	// for conveinence ( in order for this code to work), it is possible to format date for json as the standard format
+	// i.e. deadlines.json due_date is listed as e.g. Sun Nov 17 2019
+	const date = new Date();
+	// let timeNow = date.toLocaleTimeString();
+	const dateNow = date.toDateString();
+	// let timeDeadline = jsonObj.deadlines[i].due_time;
+	for (i in deadlines) {
+		if (jsonObj.deadlines[i].due_date === dateNow) {
+			message.send('WARNING: Assignment ' + jsonObj.deadlines[i].topic + ' is due today!!!');
+			// there isn't really a better way to describe the deadlines
+			// apart from id
+			// add a name field?
+			//
+			// The topic field is the name/nature of the assignment
+			//	It will set a reminder for the Job here I guess I'll work it out,
+			//	Changed to cron as cron is allegedly guaranteed to run
+			console.log('Alert Job set for ' + jsonObj.deadlines[i].ID + ' at ' + jsonObj.deadlines[i].due_time);
+		}
+	}
+}
 let i = 0;
-const deadlines = jsonObj.deadlines;
+
 module.exports = {
 	name: 'deadline',
 	description: 'Reminds you of upcoming assignment deadlines!',
@@ -58,6 +94,10 @@ module.exports = {
 			let a = 0;
 			//	b holds the start of the trailing arguements lol
 			let b = 4;
+			if (deadlines.subject.includes(args[1])) {
+				//	Sets generic if subject is not real
+				args[1] = "1BCT1";
+			}
 			for (i in deadlines) {
 				(deadlines[i].id > a) ? a = deadlines[i].id : null;
 				//	Duplicate Checking
@@ -85,13 +125,8 @@ module.exports = {
 			let in_list = 0;
 			//	Obvious check to ensure that the ID you want rid of is an actual number lol
 			if (!isNaN(idtag)) {
-				for (i in deadlines) {
-					if (deadlines[i].id === idtag) {
-						deadlines.splice(i, 1);
-						in_list = 1;
-						break;
-					}
-				}
+				//	Made it into a function so the deadline alert can use it
+				in_list = deadline_remove(idtag);
 				if (in_list) {
 					message.channel.send('Assignment removed successfully!');
 				}
@@ -103,7 +138,6 @@ module.exports = {
 				message.channel.send(args[1] + ' is not a valid number!');
 				console.log('ERROR: Deadline - NAN Val: ' + args[1]);
 			}
-			refresh_deadlines();
 		}
 		else if (args[0] == '--update') {
 			//	formatting
@@ -132,6 +166,17 @@ module.exports = {
 			//	Mandatory Error Handling
 			message.channel.send('Invalid operator, please use --help to get all possible commands');
 			console.log('Deadline: error - Invalid operator ' + args[0]);
+		}
+	},
+	checker(client, channel, announce) {
+		const message = client.channels.get(channel);
+		if (announce) {
+			message.send("Happy Monday <@everyone> here are this weeks assignments!");
+			const output = deadlines_fetch();
+			message.send(output);
+		}
+		else {
+			deadline_warn(message);
 		}
 	},
 };
