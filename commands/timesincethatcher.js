@@ -10,7 +10,7 @@ module.exports = {
 
 		if (args[0] == "--thatcher") {
     		numOfDays = Math.floor(difference / 8.64e+7);
-    		message.channel.send("It has been" +numOfDays+ "days since Thatcher has died");
+    		message.channel.send("It has been " + numOfDays + " days since Thatcher has died");
     		message.channel.send("Here's a picture of Thatcher's grave", {files: ["https://upload.wikimedia.org/wikipedia/commons/e/e3/MTgrave2.jpeg"]});
 		}
     },
