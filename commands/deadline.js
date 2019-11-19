@@ -15,6 +15,25 @@ function deadlines_fetch() {
 	return output;
 }
 
+
+// function to warn people, based on date now and date of asssignment
+// please to look over
+// for conveinence ( in order for this code to work), it is possible to formate date for json as the standard format
+// i.e. deadlines.json due_date is listed as e.g. Sun Nov 17 2019
+/* function date_deadline_alarm_check() {
+const date = new Date();
+let timeNow = date.toLocaleTimeString();
+let dateNow = date.toDateString();
+let timeDeadline = jsonObj.deadlines[i].due_time;
+
+
+for (i in deadlines) {
+    if (jsonObj.deadlines[i].due_date == dateNow) {
+        message.channel.send('WARNING: Assignment'+jsonObj.deadlines[i].id+"is due today!!!');
+        // there isn't really a better way to describe the deadlines
+        // apart from id
+        // add a name field?
+    }
 //	Made in prep for the deadline task thing lol
 function deadline_remove(idtag) {
 	for (i in deadlines) {
