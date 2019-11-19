@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'timeSinceThatcher',
+    name: 'timesincethatcher',
     description: 'prints days since thatcher\'s death in days, and an image of her grave',
     
 execute(message, args) {
