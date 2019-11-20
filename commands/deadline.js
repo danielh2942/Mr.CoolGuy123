@@ -1,7 +1,7 @@
 //	deadline.js	- Half assed deadline tracker
 const fs = require('fs');
 const jsonObj = require("./deadlines.json");
-// const Schedule = require('cron').CronJob;
+const Schedule = require('cron').CronJob;
 
 const deadlines = jsonObj.deadlines;
 
@@ -44,10 +44,11 @@ function deadline_warn(message) {
 	const date = new Date();
 	// let timeNow = date.toLocaleTimeString();
 	const dateNow = date.toDateString();
-	// let timeDeadline = jsonObj.deadlines[i].due_time;
+	let timeDeadline = jsonObj.deadlines[i].due_time;
 	for (i in deadlines) {
 		if (jsonObj.deadlines[i].due_date === dateNow) {
 			message.send('WARNING: Assignment ' + jsonObj.deadlines[i].topic + ' is due today!!!');
+			timeDeadline = jsonObj.deadlines[i].due_time;
 			// there isn't really a better way to describe the deadlines
 			// apart from id
 			// add a name field?
@@ -55,7 +56,13 @@ function deadline_warn(message) {
 			// The topic field is the name/nature of the assignment
 			//	It will set a reminder for the Job here I guess I'll work it out,
 			//	Changed to cron as cron is allegedly guaranteed to run
-			console.log('Alert Job set for ' + jsonObj.deadlines[i].ID + ' at ' + jsonObj.deadlines[i].due_time);
+			// SS MM HH DD MM Dayofweek(0-6)
+			console.log('Alert Job set for ' + jsonObj.deadlines[i].ID + ' at ' + timeDeadline);
+			new Schedule(timeDeadline, function() {
+				console.log('Alert for ' + jsonObj.deadlines[i].id + ' has been completed');
+				message.send('Deadline for ' + jsonObj.deadlines[i].topic + 'Has elapsed!');
+				deadline_remove(jsonObj.deadlines[i].id);
+			});
 		}
 	}
 }
