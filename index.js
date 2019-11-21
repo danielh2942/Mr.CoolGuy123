@@ -75,11 +75,11 @@ client.on('message', message => {
 new Schedule('0 0 9 * * 1', function() {
 	const command = client.commands.get('deadline');
 	command.checker(client, announce, 1);
-});
+}, null, true, 'Europe/Dublin');
 //	Daily covert deadline check
 new Schedule('0 30 8 * * *', function() {
 	let command = client.commands.get('deadline');
-	// command.checker(client, announce, 0);
+	command.checker(client, announce, 0);
 	command = client.commands.get('timesincethatcher');
 	command.checker(client, announce);
 }, null, true, 'Europe/Dublin');
