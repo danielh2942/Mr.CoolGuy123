@@ -17,11 +17,18 @@ function deadlines_fetch(channel) {
 let server;
 function get_server_deadlines(channel) {
 	let a = 0;
+	let exists = 0;
 	for (a in jsonObj.server) {
 		if (jsonObj.server[a].name === channel) {
 			server = jsonObj.server[a];
+			exists = 1;
 			break;
 		}
+	}
+	if (!exists) {
+		// Creates new instance of a server, can't believe I forgot this hahaha
+		jsonObj.server[a + 1] = { "name" : channel, "subjects" : ["MA190", "EE130", "CT101", "CT102", "CT103", "CT1112", "CT1113", "PH150", "BCT1"], "deadlines" : [] };
+		server = jsonObj.server[a + 1];
 	}
 	return server;
 }
