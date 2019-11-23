@@ -1,16 +1,17 @@
 { 
-	"name" : "cooltest",
-	"subjects" : ["MA190","EE130","CT101","CT102","CT103","CT1112","CT1113","PH150","BCT1"],
-	"deadlines" : [
+	"server" : [
 		{
-			"id" 		:	1,
-			"subject"	:	"CT101",
-			"topic"		:	"Operating Systems",
-			"due_date"	: 	"15-11-2019",
-			"due_time" 	:	"17:00"
+			"name" : "643790299117912067",
+			"subjects" : ["MA190","EE130","CT101","CT102","CT103","CT1112","CT1113","PH150","BCT1"],
+			"deadlines" : [
+				{
+					"id" 		:	1,
+					"subject"	:	"CT101",
+					"topic"		:	"Operating Systems",
+					"due_date"	: 	"15-11-2019",
+					"due_time" 	:	"17:00"
+				}
+			]
 		}
-	],
-	"fmessage" : {
-		"channel" : "643790299117912067"
-	}
+	]
 }

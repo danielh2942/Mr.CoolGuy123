@@ -3,10 +3,10 @@ const fs = require('fs');
 const jsonObj = require("./deadlines.json");
 const Schedule = require('cron').CronJob;
 
-const deadlines = jsonObj.deadlines;
-
-function deadlines_fetch() {
+function deadlines_fetch(channel) {
 	let output = '';
+	const server = get_server_deadlines(channel);
+	const deadlines = server.deadlines;
 	for (i in deadlines) {
 		console.log('checking deadlines');
 		//	Forgot to append results rip
@@ -14,9 +14,22 @@ function deadlines_fetch() {
 	}
 	return output;
 }
+let server;
+function get_server_deadlines(channel) {
+	let a = 0;
+	for (a in jsonObj.server) {
+		if (jsonObj.server[a].name === channel) {
+			server = jsonObj.server[a];
+			break;
+		}
+	}
+	return server;
+}
 
 //	Made in prep for the deadline task thing lol
-function deadline_remove(idtag) {
+function deadline_remove(idtag, channel) {
+	server = get_server_deadlines(channel);
+	const deadlines = server.deadlines;
 	for (i in deadlines) {
 		if (deadlines[i].id === idtag) {
 			deadlines.splice(i, 1);
@@ -27,16 +40,22 @@ function deadline_remove(idtag) {
 	return 0;
 }
 
-function refresh_deadlines() {
+function refresh_deadlines(channel, deadlines) {
 	//	TODO:	Needs to update deadlines.json file
 	//			Rather than just reassociating jsonObj.deadlines
-	jsonObj.deadlines = deadlines;
+	let i = 0;
+	for (i in jsonObj.server) {
+		if (jsonObj.server[i].name === channel) {
+			jsonObj.server[i].deadlines = deadlines;
+			break;
+		}
+	}
 	fs.writeFile("./deadlines.json", JSON.stringify(jsonObj), function(err) {
 		if(err) console.log('ERROR: Could not write to File');
 	});
 }
 
-function deadline_warn(message) {
+function deadline_warn(message, channel) {
 	// function to warn people, based on date now and date of asssignment
 	// please to look over
 	// for conveinence ( in order for this code to work), it is possible to format date for json as the standard format
@@ -44,11 +63,14 @@ function deadline_warn(message) {
 	const date = new Date();
 	// let timeNow = date.toLocaleTimeString();
 	const dateNow = date.toDateString();
-	let timeDeadline = jsonObj.deadlines[i].due_time;
+	// Get deadline from now restructured database
+	server = get_server_deadlines(channel);
+	const deadlines = server.deadlines;
+	let timeDeadline = server.deadline[i].due_time;
 	for (i in deadlines) {
-		if (jsonObj.deadlines[i].due_date === dateNow) {
-			message.send('WARNING: Assignment ' + jsonObj.deadlines[i].topic + ' is due today!!!');
-			timeDeadline = jsonObj.deadlines[i].due_time;
+		if (server.deadlines[i].due_date === dateNow) {
+			message.send('WARNING: Assignment ' + server.deadlines[i].topic + ' is due today!!!');
+			timeDeadline = server.deadlines[i].due_time;
 			// there isn't really a better way to describe the deadlines
 			// apart from id
 			// add a name field?
@@ -57,11 +79,11 @@ function deadline_warn(message) {
 			//	It will set a reminder for the Job here I guess I'll work it out,
 			//	Changed to cron as cron is allegedly guaranteed to run
 			// SS MM HH DD MM Dayofweek(0-6)
-			console.log('Alert Job set for ' + jsonObj.deadlines[i].ID + ' at ' + timeDeadline);
+			console.log('Alert Job set for ' + server.deadlines[i].ID + ' at ' + timeDeadline);
 			new Schedule(timeDeadline, function() {
-				console.log('Alert for ' + jsonObj.deadlines[i].id + ' has been completed');
-				message.send('Deadline for ' + jsonObj.deadlines[i].topic + 'Has elapsed!');
-				deadline_remove(jsonObj.deadlines[i].id);
+				console.log('Alert for ' + server.deadlines[i].id + ' has been completed');
+				message.send('Deadline for ' + server.deadlines[i].topic + 'Has elapsed!');
+				deadline_remove(server.deadlines[i].id);
 			});
 		}
 	}
@@ -74,6 +96,8 @@ module.exports = {
 	execute(message, args) {
 		let output = '';
 		if (args[0] == '--add') {
+			server = get_server_deadlines(message.channel);
+			const deadlines = server.deadlines;
 			//	TODO: stricter formatting - Exclusively using alotted course codes etc.
 			//	Example Formatting
 			//	!deadline --add SUBJECT DATE TIME TOPIC
@@ -103,7 +127,7 @@ module.exports = {
 			}
 			deadlines[i + 1] = { "id" : a, "subject" : args[1], "topic" : output, "due_date" : args[2], "due_time" : args[3] };
 			message.channel.send('Assignment **ID**\t' + a + '\tHas been added successfully!');
-			refresh_deadlines();
+			refresh_deadlines(message.channel, deadlines);
 		}
 		else if (args[0] == '--remove') {
 			//	Example formatting
@@ -130,6 +154,8 @@ module.exports = {
 		else if (args[0] == '--update') {
 			//	formatting
 			//	!deadline --update ID NEWDATE NEW TIME
+			server = get_server_deadlines(message.channel);
+			const deadlines = server.deadlines;
 			message.channel.send('**Updating Deadline**');
 			for (i in deadlines) {
 				if (args[1] === deadlines[i].id) {
@@ -139,11 +165,11 @@ module.exports = {
 				}
 			}
 			message.channel.send('**ID**\t' + args[1] + '\tHas been successfully updated!');
-			refresh_deadlines();
+			refresh_deadlines(message.channel, deadlines);
 		}
 		else if (args[0] == '--check') {
 			message.channel.send('**Here are all upcoming deadlines**');
-			output = deadlines_fetch(deadlines);
+			output = deadlines_fetch(message.channel);
 			message.channel.send(output);
 		}
 		else if (args[0] == '--help') {
@@ -164,7 +190,7 @@ module.exports = {
 			message.send(output);
 		}
 		else {
-			deadline_warn(message);
+			deadline_warn(message, channel);
 		}
 	},
 };
